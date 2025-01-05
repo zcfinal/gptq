@@ -176,7 +176,6 @@ def opt_eval(model, testenc, dev):
     attention_mask = cache['attention_mask']
 
     for i in range(len(layers)):
-        print(i)
         layer = layers[i].to(dev)
 
         if args.nearest:
