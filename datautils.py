@@ -9,7 +9,7 @@ def set_seed(seed):
 
 def get_wikitext2(nsamples, seed, seqlen, model):
     from datasets import load_dataset
-    traindata = load_dataset('wikitext', 'wikitext-2-raw-v1', split='train')
+    traindata = load_dataset('wikitext', 'wikitext-2-raw-v1', split='train',download_mode="force_redownload")
     testdata = load_dataset('wikitext', 'wikitext-2-raw-v1', split='test')
 
     from transformers import AutoTokenizer 
