@@ -91,7 +91,8 @@ def evaluate_models(model_id, test_prompts):
 
 def main():
     # 设置测试参数
-    model_id = "huggyllama/llama-13b"
+    model_id = "Qwen/Qwen2.5-1.5B-Instruct"
+    # model_id = "huggyllama/llama-13b"
     # model_id = "facebook/opt-6.7b"  # 可以替换为其他模型
     # model_id = "facebook/opt-125m"
     test_prompts = [
