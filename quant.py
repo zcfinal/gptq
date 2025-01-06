@@ -6,7 +6,9 @@ import torch.nn as nn
 def quantize(x, scale, zero, maxq):
     if maxq < 0:
         return (x > scale / 2).float() * scale + (x < zero / 2).float() * zero
+    # 找到对应的量化层级
     q = torch.clamp(torch.round(x / scale) + zero, 0, maxq)
+    # 反量化
     return scale * (q - zero)
 
 class Quantizer(nn.Module):
@@ -23,6 +25,7 @@ class Quantizer(nn.Module):
         mse=False, norm=2.4, grid=100, maxshrink=.8,
         trits=False
     ):
+        #最大量化层级
         self.maxq = torch.tensor(2 ** bits - 1)
         self.perchannel = perchannel
         self.sym = sym
@@ -34,10 +37,14 @@ class Quantizer(nn.Module):
             self.maxq = torch.tensor(-1) 
 
     def find_params(self, x, weight=False):
+        """
+        量化参数
+        """
         dev = x.device
         self.maxq = self.maxq.to(dev)
 
         shape = x.shape
+        # 权重特殊处理
         if self.perchannel:
             if weight:
                 x = x.flatten(1)
@@ -69,13 +76,17 @@ class Quantizer(nn.Module):
           self.scale = xmax
           self.zero = xmin
         else:
+          # 确定每个量化层级的距离
           self.scale = (xmax - xmin) / self.maxq
           if self.sym:
+              # 对称
               self.zero = torch.full_like(self.scale, (self.maxq + 1) / 2)
           else:
+              # 非对称
               self.zero = torch.round(-xmin / self.scale)
 
         if self.mse:
+            # 均方误差优化，搜索最好的量化参数
             best = torch.full([x.shape[0]], float('inf'), device=dev)
             for i in range(int(self.maxshrink * self.grid)):
                 p = 1 - i / self.grid 
